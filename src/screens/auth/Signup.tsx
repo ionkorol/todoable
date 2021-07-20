@@ -1,6 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import { Layout } from "components/common";
 import {
+  Alert,
   Box,
   Button,
   FormControl,
@@ -11,110 +12,153 @@ import {
   Text,
   VStack,
 } from "native-base";
-import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
-import * as userActions from "redux-store/actions/userActions";
-import { RootState } from "redux-store/store";
+import React, { useState } from "react";
+import * as yup from "yup";
+import { useFormik } from "formik";
+import signUp from "lib/user/signUp";
+import { errorHandler } from "lib/user";
 
-interface Props {
-  userSignup: typeof userActions.userSignup;
-  loading: boolean;
-}
+const schema = yup.object().shape({
+  name: yup.string().required("Name is required!"),
+  email: yup
+    .string()
+    .email("Must be a valid email!")
+    .required("Email is required!"),
+  password: yup.string().min(6, "Passwords must be at least 6 characters long!").required("Password is required!"),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password"), null], "Passwords must match!"),
+});
+
+interface Props {}
 
 const Signup: React.FC<Props> = (props) => {
-  const { userSignup, loading } = props;
-
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const nav = useNavigation();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  useEffect(() => {
-    console.log(name, email, password, confirmPassword);
-  }, [name, email, password, confirmPassword]);
+  const formik = useFormik({
+    validationSchema: schema,
+    initialValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    onSubmit: async (values) => {
+      setLoading(true);
+      try {
+        signUp(values.name, values.email, values.password);
+      } catch (error) {
+        setError(errorHandler(error.code));
+      }
+      setLoading(false);
+    },
+  });
   return (
     <Layout>
       <Box m={5}>
-      <Heading size="lg" color="primary.500">
-        Welcome
-      </Heading>
-      <Heading color="muted.400" size="xs">
-        Sign up to continue!
-      </Heading>
+        <Heading size="lg" color="primary.500">
+          Welcome
+        </Heading>
+        <Heading color="muted.400" size="xs">
+          Sign up to continue!
+        </Heading>
 
-      <VStack space={5} mt={10}>
-        <FormControl>
-          <FormControl.Label
-            _text={{ color: "muted.500", fontSize: "sm", bold: true }}
-          >
-            Name
-          </FormControl.Label>
-          <Input value={name} onChange={(e) => setName(e.nativeEvent.text)} />
-        </FormControl>
-        <FormControl>
-          <FormControl.Label
-            _text={{ color: "muted.500", fontSize: "sm", bold: true }}
-          >
-            Email
-          </FormControl.Label>
-          <Input value={email} onChange={(e) => setEmail(e.nativeEvent.text)} />
-        </FormControl>
-        <FormControl>
-          <FormControl.Label
-            _text={{ color: "muted.500", fontSize: "sm", bold: true }}
-          >
-            Password
-          </FormControl.Label>
-          <Input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.nativeEvent.text)}
-          />
-        </FormControl>
-        <FormControl>
-          <FormControl.Label
-            _text={{ color: "muted.500", fontSize: "sm", bold: true }}
-          >
-            Confirm Password
-          </FormControl.Label>
-          <Input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.nativeEvent.text)}
-          />
-        </FormControl>
-        <Button
-          my={5}
-          isLoading={loading}
-          isLoadingText="Signing Up"
-          onPress={() => userSignup(name, email, password)}
-        >
-          Sign Up
-        </Button>
+        {error && (
+          <Alert status="error" mt={10}>
+            <Alert.Icon />
+            <Alert.Title flexShrink={1}>{error}</Alert.Title>
+          </Alert>
+        )}
 
-        <HStack justifyContent="center">
-          <Text fontSize="sm" color="muted.400" fontWeight={400}>
-            Already have an account?{" "}
-          </Text>
-          <Link
-            _text={{ color: "primary.500", bold: true, fontSize: "sm" }}
-            onPress={() => nav.navigate("login")}
+        <VStack space={5} mt={10}>
+          <FormControl isInvalid={!!formik.errors.name}>
+            <FormControl.Label
+              _text={{ color: "muted.500", fontSize: "sm", bold: true }}
+            >
+              Name
+            </FormControl.Label>
+            <Input
+              value={formik.values.name}
+              onChange={(e) => formik.setFieldValue("name", e.nativeEvent.text)}
+            />
+            <FormControl.ErrorMessage>
+              {formik.errors.name}
+            </FormControl.ErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={!!formik.errors.email}>
+            <FormControl.Label
+              _text={{ color: "muted.500", fontSize: "sm", bold: true }}
+            >
+              Email
+            </FormControl.Label>
+            <Input
+              value={formik.values.email}
+              onChange={(e) =>
+                formik.setFieldValue("email", e.nativeEvent.text)
+              }
+            />
+            <FormControl.ErrorMessage>
+              {formik.errors.email}
+            </FormControl.ErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={!!formik.errors.password}>
+            <FormControl.Label
+              _text={{ color: "muted.500", fontSize: "sm", bold: true }}
+            >
+              Password
+            </FormControl.Label>
+            <Input
+              type="password"
+              value={formik.values.password}
+              onChange={(e) =>
+                formik.setFieldValue("password", e.nativeEvent.text)
+              }
+            />
+            <FormControl.ErrorMessage>
+              {formik.errors.password}
+            </FormControl.ErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={!!formik.errors.confirmPassword}>
+            <FormControl.Label
+              _text={{ color: "muted.500", fontSize: "sm", bold: true }}
+            >
+              Confirm Password
+            </FormControl.Label>
+            <Input
+              type="password"
+              value={formik.values.confirmPassword}
+              onChange={(e) =>
+                formik.setFieldValue("confirmPassword", e.nativeEvent.text)
+              }
+            />
+            <FormControl.ErrorMessage>
+              {formik.errors.confirmPassword}
+            </FormControl.ErrorMessage>
+          </FormControl>
+          <Button
+            my={5}
+            isLoading={loading}
+            onPress={() => formik.handleSubmit()}
           >
-            Log In
-          </Link>
-        </HStack>
-      </VStack>
+            Sign Up
+          </Button>
+
+          <HStack justifyContent="center">
+            <Text fontSize="sm" color="muted.400" fontWeight={400}>
+              Already have an account?{" "}
+            </Text>
+            <Link
+              _text={{ color: "primary.500", bold: true, fontSize: "sm" }}
+              onPress={() => nav.navigate("login")}
+            >
+              Log In
+            </Link>
+          </HStack>
+        </VStack>
       </Box>
     </Layout>
   );
 };
 
-const mapState = (state: RootState) => ({
-  loading: state.user.loading,
-});
-
-const mapDispatch = {
-  userSignup: userActions.userSignup as any,
-};
-
-export default connect(mapState, mapDispatch)(Signup);
+export default Signup;

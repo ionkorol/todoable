@@ -7,28 +7,41 @@ import {
   Input,
   Button,
 } from "native-base";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "redux-store/store";
-import { MODAL_NEW_GROUP_SET_SHOW } from "redux-store/actions/types";
 import { createGroup } from "lib/group";
+import * as yup from "yup";
+import { showNewGroupModal } from "lib/modals";
+import { useFormik } from "formik";
+
+const schema = yup.object().shape({
+  name: yup.string().required("Group name is required!"),
+});
 
 interface Props {}
 
 const NewGroupModal: React.FC<Props> = (props) => {
-  const show = useSelector((state: RootState) => state.modals.newGroup);
-  const [name, setName] = useState("");
-  const dispatch = useDispatch();
-  const handleSubmit = async () => {
-    const res = await createGroup({ name } as any);
-    if (res) {
-      onClose();
-    } else {
-      console.log("error");
-    }
-  };
+  const [loading, setLoading] = useState(false);
 
-  const onClose = () =>
-    dispatch({ type: MODAL_NEW_GROUP_SET_SHOW, payload: false });
+  const show = useSelector((state: RootState) => state.modals.newGroup);
+  const formik = useFormik({
+    validationSchema: schema,
+    initialValues: {
+      name: "",
+    },
+    onSubmit: async (values) => {
+      setLoading(true);
+      const res = await createGroup({ ...values } as any);
+      if (res) {
+        onClose();
+      } else {
+        console.log("error");
+      }
+      setLoading(false);
+    },
+  });
+
+  const onClose = () => showNewGroupModal(false);
 
   return (
     <Modal isOpen={show} onClose={onClose}>
@@ -38,22 +51,29 @@ const NewGroupModal: React.FC<Props> = (props) => {
         <Modal.Body>
           <ScrollView>
             <VStack space={10} mt={5}>
-              <FormControl>
+              <FormControl isInvalid={!!formik.errors.name}>
                 <FormControl.Label
                   _text={{ color: "muted.500", fontSize: "sm", bold: true }}
                 >
                   Name
                 </FormControl.Label>
                 <Input
-                  value={name}
-                  onChange={(e) => setName(e.nativeEvent.text)}
+                  value={formik.values.name}
+                  onChange={(e) =>
+                    formik.setFieldValue("name", e.nativeEvent.text)
+                  }
                 />
+                <FormControl.ErrorMessage>
+                  {formik.errors.name}
+                </FormControl.ErrorMessage>
               </FormControl>
             </VStack>
           </ScrollView>
         </Modal.Body>
         <Modal.Footer>
-          <Button onPress={handleSubmit}>Create Group</Button>
+          <Button isLoading={loading} onPress={() => formik.handleSubmit()}>
+            Create Group
+          </Button>
         </Modal.Footer>
       </Modal.Content>
     </Modal>

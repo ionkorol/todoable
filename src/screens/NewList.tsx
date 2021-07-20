@@ -1,52 +1,65 @@
 import { useNavigation } from "@react-navigation/native";
 import { Layout } from "components/common";
 import { createList } from "lib/list";
-import {
-  Heading,
-  VStack,
-  FormControl,
-  Input,
-  HStack,
-  Link,
-  Button,
-} from "native-base";
+import { VStack, FormControl, Input, Button, Alert } from "native-base";
 import React, { useState } from "react";
+import * as yup from "yup";
+import { useFormik } from "formik";
+
+const schema = yup.object().shape({
+  name: yup.string().required("List name is required!"),
+});
 
 interface Props {}
 
 const NewList: React.FC<Props> = (props) => {
-  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const nav = useNavigation();
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    const res = await createList({ name } as any);
-    setLoading(false);
-    if (res) {
-      nav.goBack();
-    } else {
-      console.log("Error");
-    }
-  };
+  const formik = useFormik({
+    validationSchema: schema,
+    initialValues: {
+      name: "",
+    },
+    onSubmit: async (values) => {
+      setLoading(true);
+      const res = await createList({ ...values } as any);
+      setLoading(false);
+      if (res) {
+        nav.goBack();
+      } else {
+        setError("Unable to create list!");
+      }
+    },
+  });
 
   return (
     <Layout>
-      <VStack space={10} mt={5} mx={5}>
-        <FormControl>
+      <VStack space={10} m={5}>
+        {error && (
+          <Alert status="error">
+            <Alert.Icon />
+            <Alert.Title flexShrink={1}>{error}</Alert.Title>
+          </Alert>
+        )}
+        <FormControl isInvalid={!!formik.errors.name}>
           <FormControl.Label
             _text={{ color: "muted.500", fontSize: "sm", bold: true }}
           >
             Name
           </FormControl.Label>
-          <Input value={name} onChange={(e) => setName(e.nativeEvent.text)} />
+          <Input
+            value={formik.values.name}
+            onChange={(e) => formik.setFieldValue("name", e.nativeEvent.text)}
+          />
+          <FormControl.ErrorMessage>
+            {formik.errors.name}
+          </FormControl.ErrorMessage>
         </FormControl>
 
-        <Button
-          isLoading={loading}
-          isLoadingText="Creating..."
-          onPress={handleSubmit}
-        >
+        <Button isLoading={loading} onPress={() => formik.handleSubmit()}>
           Create List
         </Button>
       </VStack>

@@ -14,11 +14,12 @@ import {
   Center,
   Divider,
   IconButton,
+  Pressable,
 } from "native-base";
 import React, { FC, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GroupProp } from "utils/interfaces";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { GroupsModal, InviteGroupModal, NewGroupModal } from "components/home";
 import { getGroup } from "lib/group";
 import { RootState } from "redux-store/store";
@@ -35,7 +36,7 @@ const Main: FC<Props> = (props) => {
   const [data, setData] = useState<GroupProp | null>(null);
   const [noGroups, setNoGroups] = useState<boolean | null>(null);
   const user = useSelector((state: RootState) => state.user.data!);
-  const dispatch = useDispatch();
+  const nav = useNavigation();
 
   const handleGetGroup = async () => {
     const res = await getGroup(user.selectedGroup);
@@ -88,7 +89,7 @@ const Main: FC<Props> = (props) => {
         />
       </HStack>
 
-      <Box my={5}>
+      <Pressable onPress={() => nav.navigate("Account")} my={5}>
         <Divider />
         <HStack p={5} justifyContent="space-between" alignItems="center">
           <VStack>
@@ -105,7 +106,7 @@ const Main: FC<Props> = (props) => {
           </Avatar>
         </HStack>
         <Divider />
-      </Box>
+      </Pressable>
       <Box px={5}>
         <Heading>Lists</Heading>
       </Box>

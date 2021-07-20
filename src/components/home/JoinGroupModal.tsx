@@ -1,27 +1,44 @@
 import { joinGroup } from "lib/group";
 import { showJoinGroupModal } from "lib/modals";
-import {
-  VStack,
-  FormControl,
-  Input,
-  Modal,
-  ScrollView,
-  Button,
-} from "native-base";
+import { VStack, FormControl, Input, Modal, Alert, Button } from "native-base";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "redux-store/store";
+import * as yup from "yup";
+import { useFormik } from "formik";
+
+const schema = yup.object().shape({
+  id: yup.string().required("ID is required!"),
+});
 
 const JoinGroupModal = () => {
-  const [id, setID] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const show = useSelector((state: RootState) => state.modals.joinGroup);
   const onClose = () => showJoinGroupModal(false);
-  const handleSubmit = () => {
-    joinGroup(id);
-    onClose();
-  };
 
-  console.log(show)
+  const formik = useFormik({
+    validationSchema: schema,
+    initialValues: {
+      id: "",
+    },
+    onSubmit: async (values) => {
+      setLoading(true);
+      try {
+        const res = await joinGroup(values.id);
+        if (res) {
+          onClose();
+        } else {
+          setError("Unabel to join group!");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      setLoading(false);
+    },
+  });
+
+  console.log(show);
 
   return (
     <Modal isOpen={show} onClose={onClose}>
@@ -29,21 +46,33 @@ const JoinGroupModal = () => {
         <Modal.CloseButton />
         <Modal.Header>Join Group</Modal.Header>
         <Modal.Body>
-          <ScrollView>
-            <VStack space={10} mt={5}>
-              <FormControl>
-                <FormControl.Label
-                  _text={{ color: "muted.500", fontSize: "sm", bold: true }}
-                >
-                  ID
-                </FormControl.Label>
-                <Input value={id} onChange={(e) => setID(e.nativeEvent.text)} />
-              </FormControl>
-            </VStack>
-          </ScrollView>
+          <VStack space={10} mt={5}>
+            {error && (
+              <Alert status="error">
+                <Alert.Icon />
+                <Alert.Title flexShrink={1}>{error}</Alert.Title>
+              </Alert>
+            )}
+            <FormControl isInvalid={!!formik.errors.id}>
+              <FormControl.Label
+                _text={{ color: "muted.500", fontSize: "sm", bold: true }}
+              >
+                ID
+              </FormControl.Label>
+              <Input
+                value={formik.values.id}
+                onChange={(e) => formik.setFieldValue("id", e.nativeEvent.text)}
+              />
+              <FormControl.ErrorMessage>
+                {formik.errors.id}
+              </FormControl.ErrorMessage>
+            </FormControl>
+          </VStack>
         </Modal.Body>
         <Modal.Footer>
-          <Button onPress={handleSubmit}>Join Group</Button>
+          <Button isLoading={loading} onPress={() => formik.handleSubmit()}>
+            Join Group
+          </Button>
         </Modal.Footer>
       </Modal.Content>
     </Modal>

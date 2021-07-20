@@ -1,6 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
 import { HomeScreen, ListScreen, NewListScreen, NewTaskScreen } from "screens";
+import { AccountScreen } from "screens/settings";
 
 const Stack = createStackNavigator();
 
@@ -26,6 +27,11 @@ const HomeNavigation = () => {
         name="NewTask"
         component={NewTaskScreen}
         options={{ headerTitle: "New Task" }}
+      />
+      <Stack.Screen
+        name="Account"
+        component={AccountScreen}
+        options={{ headerTitle: "My Account" }}
       />
     </Stack.Navigator>
   );

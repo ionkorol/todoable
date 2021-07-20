@@ -1,7 +1,6 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Layout } from "components/common";
-import firebase from "firebase";
+import { errorHandler, logIn } from "lib/user";
 import {
   Box,
   Button,
@@ -12,13 +11,46 @@ import {
   Link,
   VStack,
   Text,
+  Alert,
 } from "native-base";
 import React, { useState } from "react";
+import * as yup from "yup";
+import { useFormik } from "formik";
+
+const schema = yup.object().shape({
+  email: yup
+    .string()
+    .email("Must be a valid email!")
+    .required("Email is required!"),
+  password: yup.string().required(),
+});
 
 const Login = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const nav = useNavigation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
+  const formik = useFormik({
+    validationSchema: schema,
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    onSubmit: async (values) => {
+      setLoading(true);
+      try {
+        await logIn(values.email, values.password);
+      } catch (error) {
+        console.log(error);
+        setError(errorHandler(error.code));
+      }
+      setLoading(false);
+    },
+  });
+
+  console.log(formik.values);
+
   return (
     <Layout>
       <Box m={5}>
@@ -28,20 +60,31 @@ const Login = () => {
         <Heading color="muted.400" size="xs">
           Sign in to continue!
         </Heading>
+        {error && (
+          <Alert status="error" mt={10}>
+            <Alert.Icon />
+            <Alert.Title flexShrink={1}>{error}</Alert.Title>
+          </Alert>
+        )}
 
         <VStack space={10} mt={10}>
-          <FormControl>
+          <FormControl isInvalid={!!formik.errors.email}>
             <FormControl.Label
               _text={{ color: "muted.500", fontSize: "sm", fontWeight: 600 }}
             >
               Email ID
             </FormControl.Label>
             <Input
-              value={email}
-              onChange={(e) => setEmail(e.nativeEvent.text)}
+              value={formik.values.email}
+              onChange={(e) =>
+                formik.setFieldValue("email", e.nativeEvent.text)
+              }
             />
+            <FormControl.ErrorMessage>
+              {formik.errors.email}
+            </FormControl.ErrorMessage>
           </FormControl>
-          <FormControl>
+          <FormControl isInvalid={!!formik.errors.password}>
             <FormControl.Label
               _text={{ color: "muted.500", fontSize: "sm", fontWeight: 600 }}
             >
@@ -49,9 +92,14 @@ const Login = () => {
             </FormControl.Label>
             <Input
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.nativeEvent.text)}
+              value={formik.values.password}
+              onChange={(e) =>
+                formik.setFieldValue("password", e.nativeEvent.text)
+              }
             />
+            <FormControl.ErrorMessage>
+              {formik.errors.password}
+            </FormControl.ErrorMessage>
             <Link
               _text={{
                 fontSize: "xs",
@@ -64,11 +112,7 @@ const Login = () => {
               Forget Password?
             </Link>
           </FormControl>
-          <Button
-            onPress={() =>
-              firebase.auth().signInWithEmailAndPassword(email, password)
-            }
-          >
+          <Button isLoading={loading} onPress={() => formik.handleSubmit()}>
             Login
           </Button>
 
