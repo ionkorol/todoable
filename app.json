@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "our-todo",
+    "name": "Our TODO",
     "slug": "our-todo",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,11 +13,11 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "digital.korol.todo",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
