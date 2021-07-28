@@ -36,7 +36,6 @@ const ProgressList: React.FC<Props> = (props) => {
           const userData = await getUser(progressDoc.user);
           progressData = [...progressData, { ...progressDoc, user: userData }];
         }
-
         setData(progressData as TaskProgressProp[]);
       });
 

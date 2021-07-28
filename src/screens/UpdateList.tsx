@@ -1,7 +1,15 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Layout } from "components/common";
-import { getList, updateList } from "lib/list";
-import { VStack, FormControl, Input, Button, Alert } from "native-base";
+import { deleteList, getList, updateList } from "lib/list";
+import {
+  VStack,
+  FormControl,
+  Input,
+  Button,
+  Alert,
+  Center,
+  Spinner,
+} from "native-base";
 import React, { useEffect, useState } from "react";
 import * as yup from "yup";
 import { useFormik } from "formik";
@@ -16,6 +24,7 @@ interface Props {}
 const UpdateList: React.FC<Props> = (props) => {
   const [data, setData] = useState<ListProp | null>(null);
   const [loading, setLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const nav = useNavigation();
@@ -51,6 +60,16 @@ const UpdateList: React.FC<Props> = (props) => {
     }
   }, [route.params]);
 
+  if (!data) {
+    return (
+      <Layout>
+        <Center>
+          <Spinner />
+        </Center>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <VStack space={10} m={5}>
@@ -77,6 +96,23 @@ const UpdateList: React.FC<Props> = (props) => {
 
         <Button isLoading={loading} onPress={() => formik.handleSubmit()}>
           Update List
+        </Button>
+        <Button
+          isLoading={deleteLoading}
+          colorScheme="error"
+          _text={{ color: "white" }}
+          onPress={async () => {
+            setDeleteLoading(true);
+            try {
+              await deleteList(data.id);
+              nav.goBack();
+            } catch (error) {
+              setError(error.message);
+            }
+            setDeleteLoading(false);
+          }}
+        >
+          Delete List
         </Button>
       </VStack>
     </Layout>

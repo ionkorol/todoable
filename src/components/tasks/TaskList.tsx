@@ -1,20 +1,8 @@
-import { Feather } from "@expo/vector-icons";
-import {
-  Text,
-  Pressable,
-  Icon,
-  FlatList,
-  Divider,
-  HStack,
-  Input,
-  IconButton,
-  VStack,
-  Box,
-} from "native-base";
+import { FlatList, Divider, Box, Heading } from "native-base";
 import React, { useCallback, useEffect, useState } from "react";
 import { TaskProp } from "utils/interfaces";
 import TaskItem from "./TaskItem";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import firebase from "firebase";
 import { useSelector } from "react-redux";
 import { RootState } from "redux-store/store";
@@ -77,8 +65,10 @@ const TaskList: React.FC<Props> = (props) => {
       renderItem={({ item }) => <TaskItem item={item} />}
       ItemSeparatorComponent={Divider}
       ListEmptyComponent={
-        <Box>
-          <Text>No Tasks</Text>
+        <Box p={2}>
+          <Heading size="md" color="error.500">
+            No tasks
+          </Heading>
         </Box>
       }
       ListHeaderComponent={

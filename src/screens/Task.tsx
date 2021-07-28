@@ -3,7 +3,7 @@ import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { Layout } from "components/common";
 import { ProgressList } from "components/task";
 import { useFormik } from "formik";
-import { getTask, updateTask } from "lib/task";
+import { deleteTask, getTask, updateTask } from "lib/task";
 import {
   VStack,
   FormControl,
@@ -26,6 +26,7 @@ const schema = yup.object().shape({
 });
 
 const Task = () => {
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<TaskProp | null>(null);
@@ -55,7 +56,9 @@ const Task = () => {
 
   useFocusEffect(
     useCallback(() => {
-      (async () => setData(await getTask(taskId)))();
+      (async () => {
+        setData(await getTask(taskId));
+      })();
     }, [])
   );
 
@@ -100,6 +103,19 @@ const Task = () => {
         <ProgressList taskId={data.id} />
         <Button isLoading={loading} onPress={() => formik.handleSubmit()}>
           Update Task
+        </Button>
+        <Button
+          isLoading={deleteLoading}
+          colorScheme="error"
+          _text={{ color: "white" }}
+          onPress={async () => {
+            setDeleteLoading(true);
+            await deleteTask(data.id);
+            setDeleteLoading(false);
+            nav.goBack();
+          }}
+        >
+          Delete Task
         </Button>
       </VStack>
     </Layout>

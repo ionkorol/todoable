@@ -14,7 +14,6 @@ const schema = yup.object().shape({
 interface Props {}
 
 const NewList: React.FC<Props> = (props) => {
-  const [data, setData] = useState<ListProp | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +23,7 @@ const NewList: React.FC<Props> = (props) => {
   const formik = useFormik({
     validationSchema: schema,
     initialValues: {
-      name: data ? data.name : "",
+      name: "",
     },
     onSubmit: async (values) => {
       setLoading(true);
@@ -38,16 +37,6 @@ const NewList: React.FC<Props> = (props) => {
     },
     enableReinitialize: true,
   });
-
-  const handleGetList = async (listId: string) => {
-    setData(await getList(listId));
-  };
-
-  useEffect(() => {
-    if ((route.params as any).listId) {
-      handleGetList((route.params as any).listId);
-    }
-  }, [route.params]);
 
   return (
     <Layout>
