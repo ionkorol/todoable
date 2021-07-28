@@ -2,6 +2,7 @@ import {
   MODAL_GROUPS_SET_SHOW,
   MODAL_INVITE_GROUP_SET_SHOW,
   MODAL_JOIN_GROUP_SET_SHOW,
+  MODAL_MEMBERS_GROUP_SET_SHOW,
   MODAL_NEW_GROUP_SET_SHOW,
 } from "redux-store/actions/types";
 import store from "redux-store/store";
@@ -27,5 +28,11 @@ export const showJoinGroupModal = (show: boolean) =>
 export const showInviteGroupModal = (show: boolean) =>
   dispatch({
     type: MODAL_INVITE_GROUP_SET_SHOW,
+    payload: show,
+  });
+
+export const showMembersGroupModal = (show: boolean) =>
+  dispatch({
+    type: MODAL_MEMBERS_GROUP_SET_SHOW,
     payload: show,
   });

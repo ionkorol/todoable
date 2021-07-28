@@ -1,6 +1,6 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Layout } from "components/common";
-import { createList, getList, getLists } from "lib/list";
+import { getList, updateList } from "lib/list";
 import { VStack, FormControl, Input, Button, Alert } from "native-base";
 import React, { useEffect, useState } from "react";
 import * as yup from "yup";
@@ -13,14 +13,14 @@ const schema = yup.object().shape({
 
 interface Props {}
 
-const NewList: React.FC<Props> = (props) => {
+const UpdateList: React.FC<Props> = (props) => {
   const [data, setData] = useState<ListProp | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const nav = useNavigation();
   const route = useRoute();
-
+  const listId = route.params ? (route.params as any).listId : null;
   const formik = useFormik({
     validationSchema: schema,
     initialValues: {
@@ -28,12 +28,14 @@ const NewList: React.FC<Props> = (props) => {
     },
     onSubmit: async (values) => {
       setLoading(true);
-      const res = await createList({ ...values } as any);
+      const res = await updateList(listId, {
+        ...values,
+      } as any);
       setLoading(false);
       if (res) {
         nav.goBack();
       } else {
-        setError("Unable to create list!");
+        setError("Unable to update list!");
       }
     },
     enableReinitialize: true,
@@ -74,11 +76,11 @@ const NewList: React.FC<Props> = (props) => {
         </FormControl>
 
         <Button isLoading={loading} onPress={() => formik.handleSubmit()}>
-          Create List
+          Update List
         </Button>
       </VStack>
     </Layout>
   );
 };
 
-export default NewList;
+export default UpdateList;

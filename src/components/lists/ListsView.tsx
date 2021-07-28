@@ -3,24 +3,14 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "redux-store/store";
 import { ListProp } from "utils/interfaces";
-import { ListItem } from ".";
-import NewListItem from "./NewListItem";
-import { getLists } from "lib/list";
 import firebase from "firebase";
+import ListItem from "./ListItem";
+import NewListItem from "./NewListItem";
 
 interface Props {}
 
 const ListsView: React.FC<Props> = (props) => {
   const [data, setData] = useState<ListProp[]>([]);
-
-  // const handleGetLists = async () => {
-  //   const res = await getLists();
-  //   if (res) {
-  //     setData(res);
-  //   } else {
-  //     console.log("Error Lists");
-  //   }
-  // };
 
   const user = useSelector((state: RootState) => state.user.data);
 

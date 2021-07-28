@@ -69,11 +69,7 @@ const Login = () => {
 
         <VStack space={10} mt={10}>
           <FormControl isInvalid={!!formik.errors.email}>
-            <FormControl.Label
-              _text={{ color: "muted.500", fontSize: "sm", fontWeight: 600 }}
-            >
-              Email ID
-            </FormControl.Label>
+            <FormControl.Label>Email ID</FormControl.Label>
             <Input
               value={formik.values.email}
               onChange={(e) =>
@@ -85,11 +81,7 @@ const Login = () => {
             </FormControl.ErrorMessage>
           </FormControl>
           <FormControl isInvalid={!!formik.errors.password}>
-            <FormControl.Label
-              _text={{ color: "muted.500", fontSize: "sm", fontWeight: 600 }}
-            >
-              Password
-            </FormControl.Label>
+            <FormControl.Label>Password</FormControl.Label>
             <Input
               type="password"
               value={formik.values.password}

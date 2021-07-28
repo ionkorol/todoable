@@ -14,9 +14,16 @@ export interface TaskProp {
   description: string;
   // date: string;
   // time: string;
-  archived: boolean;
   list: string;
   status: "active" | "overdue" | "complete";
+  progress: TaskProgressProp[];
+}
+
+export interface TaskProgressProp {
+  id: string;
+  createdAt: number;
+  user: UserProp;
+  description: string;
 }
 
 export interface ListProp {
