@@ -54,7 +54,11 @@ const theme = extendTheme({
     },
     Input: {
       baseStyle: {},
+      defaultProps: {
+        variant: "filled",
+      },
     },
+    IconButton: {},
     FormControlLabel: {
       baseStyle: {
         _text: {

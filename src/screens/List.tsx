@@ -12,11 +12,6 @@ const List: React.FC<Props> = (props) => {
   return (
     <Layout>
       <TaskList />
-      {/* <Fab
-        onPress={() => nav.navigate("NewTask")}
-        position="absolute"
-        icon={<Icon color="white" as={<Feather name="plus" />} />}
-      /> */}
     </Layout>
   );
 };

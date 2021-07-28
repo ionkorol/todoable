@@ -24,7 +24,10 @@ const schema = yup.object().shape({
     .string()
     .email("Must be a valid email!")
     .required("Email is required!"),
-  password: yup.string().min(6, "Passwords must be at least 6 characters long!").required("Password is required!"),
+  password: yup
+    .string()
+    .min(6, "Passwords must be at least 6 characters long!")
+    .required("Password is required!"),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref("password"), null], "Passwords must match!"),
@@ -73,12 +76,9 @@ const Signup: React.FC<Props> = (props) => {
 
         <VStack space={5} mt={10}>
           <FormControl isInvalid={!!formik.errors.name}>
-            <FormControl.Label
-              _text={{ color: "muted.500", fontSize: "sm", bold: true }}
-            >
-              Name
-            </FormControl.Label>
+            <FormControl.Label>Name</FormControl.Label>
             <Input
+              placeholder="Enter your name"
               value={formik.values.name}
               onChange={(e) => formik.setFieldValue("name", e.nativeEvent.text)}
             />
@@ -87,12 +87,9 @@ const Signup: React.FC<Props> = (props) => {
             </FormControl.ErrorMessage>
           </FormControl>
           <FormControl isInvalid={!!formik.errors.email}>
-            <FormControl.Label
-              _text={{ color: "muted.500", fontSize: "sm", bold: true }}
-            >
-              Email
-            </FormControl.Label>
+            <FormControl.Label>Email</FormControl.Label>
             <Input
+              placeholder="Enter your email"
               value={formik.values.email}
               onChange={(e) =>
                 formik.setFieldValue("email", e.nativeEvent.text)
@@ -103,12 +100,9 @@ const Signup: React.FC<Props> = (props) => {
             </FormControl.ErrorMessage>
           </FormControl>
           <FormControl isInvalid={!!formik.errors.password}>
-            <FormControl.Label
-              _text={{ color: "muted.500", fontSize: "sm", bold: true }}
-            >
-              Password
-            </FormControl.Label>
+            <FormControl.Label>Password</FormControl.Label>
             <Input
+              placeholder="Enter your password"
               type="password"
               value={formik.values.password}
               onChange={(e) =>
@@ -120,12 +114,9 @@ const Signup: React.FC<Props> = (props) => {
             </FormControl.ErrorMessage>
           </FormControl>
           <FormControl isInvalid={!!formik.errors.confirmPassword}>
-            <FormControl.Label
-              _text={{ color: "muted.500", fontSize: "sm", bold: true }}
-            >
-              Confirm Password
-            </FormControl.Label>
+            <FormControl.Label>Confirm Password</FormControl.Label>
             <Input
+              placeholder="Enter your password once again"
               type="password"
               value={formik.values.confirmPassword}
               onChange={(e) =>

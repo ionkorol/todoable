@@ -59,7 +59,7 @@ const ProgressAdd: React.FC<Props> = (props) => {
 
       <IconButton
         size="sm"
-        icon={<Icon color="success.500" as={<Feather name="plus" />} />}
+        icon={<Icon color="success.500" as={<Feather name="arrow-up-circle" />} />}
         onPress={() => formik.handleSubmit()}
         isLoading={loading}
         isLoadingText={undefined}

@@ -2,10 +2,10 @@
 
 ## Group
 
-[ ] Show members
+[x] Show members
 
 ## List
 
 ## Task
 
-[ ] Log
+[x] Progress

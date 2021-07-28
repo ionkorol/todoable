@@ -6,20 +6,20 @@ import React from "react";
 const NewListItem = () => {
   const nav = useNavigation();
   const handleClick = () => {
-    nav.navigate('NewList')
+    nav.navigate("NewList");
   };
   return (
     <Pressable
       bgColor="white"
-      p={10}
-      width="50%"
-      border={1}
+      p={5}
+      width="100%"
+      borderBottomWidth={1}
       borderColor="muted.200"
       alignItems="center"
       justifyContent="center"
       onPress={handleClick}
     >
-      <Icon as={<Feather name="plus" />} color="primary.500" mb={3} />
+      <Icon as={<Feather name="plus" />} color="primary.500" />
     </Pressable>
   );
 };

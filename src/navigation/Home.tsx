@@ -4,7 +4,6 @@ import {
   HomeScreen,
   ListScreen,
   NewListScreen,
-  NewTaskScreen,
   TaskScreen,
   UpdateListScreen,
 } from "screens";
@@ -35,11 +34,7 @@ const HomeNavigation = () => {
         component={ListScreen}
         options={{ headerTitle: "List" }}
       />
-      <Stack.Screen
-        name="NewTask"
-        component={NewTaskScreen}
-        options={{ headerTitle: "New Task" }}
-      />
+
       <Stack.Screen
         name="Task"
         component={TaskScreen}

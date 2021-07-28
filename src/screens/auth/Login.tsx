@@ -71,6 +71,7 @@ const Login = () => {
           <FormControl isInvalid={!!formik.errors.email}>
             <FormControl.Label>Email ID</FormControl.Label>
             <Input
+              placeholder="Enter your email"
               value={formik.values.email}
               onChange={(e) =>
                 formik.setFieldValue("email", e.nativeEvent.text)
@@ -83,6 +84,7 @@ const Login = () => {
           <FormControl isInvalid={!!formik.errors.password}>
             <FormControl.Label>Password</FormControl.Label>
             <Input
+              placeholder="Enter your password"
               type="password"
               value={formik.values.password}
               onChange={(e) =>

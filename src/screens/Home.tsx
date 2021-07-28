@@ -85,14 +85,19 @@ const Main: FC<Props> = (props) => {
           onPress={() => showMembersGroupModal(true)}
           icon={<Icon as={<Feather name="users" />} />}
         />
-        <Button
-          startIcon={<Icon as={<Feather name="users" />} size="sm" />}
-          variant="outline"
+        <Pressable
+          border={1}
+          px={2}
+          borderRadius={10}
+          justifyContent="center"
           onPress={() => showGroupsModal(true)}
           flex={1}
         >
-          {data.name}
-        </Button>
+          <HStack justifyContent="space-between">
+            <Heading size="md">{data.name}</Heading>
+            <Icon as={<Feather name="refresh-cw" />} size="sm" />
+          </HStack>
+        </Pressable>
         <IconButton
           onPress={() => showInviteGroupModal(true)}
           icon={<Icon as={<Feather name="user-plus" />} />}

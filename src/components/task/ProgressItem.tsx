@@ -40,8 +40,8 @@ const ProgressItem: React.FC<Props> = (props) => {
 
   return (
     <HStack alignItems="center" py={1}>
-      <HStack alignItems="center" space={3} flex={1}>
-        <Avatar size="sm">
+      <HStack alignItems="center" flex={1}>
+        <Avatar size="xs">
           {data.user.name
             .split(/\s/)
             .reduce(
@@ -49,8 +49,8 @@ const ProgressItem: React.FC<Props> = (props) => {
               ""
             )}
         </Avatar>
-        <Heading size="md">{data.user.name}:</Heading>
-        <Text>{data.description}</Text>
+        <Heading size="sm">{data.user.name}: </Heading>
+        <Text flex={1}>{data.description}</Text>
       </HStack>
       <HStack alignItems="center">
         <Text>{timeSince()}</Text>

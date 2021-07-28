@@ -1,7 +1,15 @@
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { setTaskStatus } from "lib/task";
-import { Box, Checkbox, Icon, Pressable, Text } from "native-base";
+import {
+  Box,
+  Checkbox,
+  HStack,
+  Icon,
+  IconButton,
+  Pressable,
+  Text,
+} from "native-base";
 import React from "react";
 import { TaskProp } from "utils/interfaces";
 
@@ -15,13 +23,7 @@ const TaskItem: React.FC<Props> = (props) => {
   const nav = useNavigation();
 
   return (
-    <Box
-      flexDirection="row"
-      justifyContent="space-between"
-      alignItems="center"
-      py={2}
-      px={5}
-    >
+    <HStack p={2} justifyContent="space-between" alignItems="center">
       <Checkbox
         value={item.name}
         isChecked={item.status === "complete"}
@@ -29,6 +31,7 @@ const TaskItem: React.FC<Props> = (props) => {
         colorScheme="success"
         _text={{ bold: true }}
         accessible
+        size="md"
         onChange={(isSelected) =>
           isSelected
             ? setTaskStatus(item.id, "complete")
@@ -37,18 +40,17 @@ const TaskItem: React.FC<Props> = (props) => {
       >
         {item.name}
       </Checkbox>
-
-      <Icon
+      <IconButton
         onPress={() =>
           nav.navigate("Task", {
             taskId: item.id,
           })
         }
-        as={<Feather name="info" />}
-        color="success.500"
-        size="sm"
+        icon={
+          <Icon as={<Feather name="edit" />} color="success.500" size="sm" />
+        }
       />
-    </Box>
+    </HStack>
   );
 };
 
