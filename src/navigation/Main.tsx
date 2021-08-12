@@ -7,16 +7,13 @@ import {
   userCredentialsUpdate,
   userDataUpdate,
 } from "redux-store/slices/user";
-import { RootState } from "redux-store/store";
 import AuthNavigation from "./Auth";
 import HomeNavigation from "./Home";
 
 interface Props {}
 
 const Main: React.FC<Props> = (props) => {
-  const { data, credentials } = useAppSelector(
-    (state: RootState) => state.user
-  );
+  const { data } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
