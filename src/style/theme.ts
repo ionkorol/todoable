@@ -1,46 +1,21 @@
-import { ComponentTheme, extendTheme } from "native-base";
-import { borderColor } from "styled-system";
+import { extendTheme } from "native-base";
 
 const theme = extendTheme({
   colors: {
     // Add new color
     primary: {
-      50: "#888888",
-      100: "#888888",
-      200: "#888888",
-      300: "#888888",
-      400: "#888888",
-      500: "#444444",
-      600: "#444444",
-      700: "#444444",
-      800: "#444444",
-      900: "#111111",
+      50: "#E4E5F1",
+      100: "#ccceea",
+      200: "#abadd5",
+      300: "#8a8dc3",
+      400: "#696cb0",
+      500: "#5458A0",
+      600: "#3d4076",
+      700: "#2b2e56",
+      800: "#181c36",
+      900: "#080819",
     },
-    secondary: {
-      500: "#666666",
-    },
-    success: {
-      50: "#3291FF",
-      100: "#3291FF",
-      200: "#3291FF",
-      300: "#3291FF",
-      400: "#3291FF",
-      500: "#0070F3",
-      600: "#0070F3",
-      700: "#0070F3",
-      800: "#0070F3",
-      900: "#0761D1",
-    },
-    // error: {
-    //   100: "#FF1A1A",
-    //   500: "#EE0000",
-    //   900: "#C50000",
-    // },
-    warning: {
-      100: "#F7B955",
-      500: "#F5A623",
-      900: "#AB570A",
-    },
+
     // Redefinig only one shade, rest of the color will remain same.
   },
   config: {
@@ -48,32 +23,88 @@ const theme = extendTheme({
     initialColorMode: "light",
   },
   components: {
+    Text: {
+      baseStyle: {
+        color: "primary.500",
+      },
+    },
+    Heading: {
+      baseStyle: {
+        color: "primary.500",
+      },
+      defaultProps: {},
+    },
     Button: {
-      baseStyle: {},
+      baseStyle: {
+        borderRadius: 10,
+      },
       defaultProps: {},
     },
     Input: {
-      baseStyle: {},
+      baseStyle: {
+        borderRadius: 10,
+        color: "primary.500",
+        backgroundColor: "muted.100",
+        placeholderTextColor: "primary.200",
+        _focus: {
+          borderWidth: 0,
+        },
+        borderWidth: 0,
+        fontWeight: "bold",
+      },
       defaultProps: {
-        variant: "filled",
+        isFullWidth: true,
+        borderWidth: 0,
+        variant: "unstyled",
       },
     },
-    IconButton: {},
+    IconButton: {
+      baseStyle: {
+        borderRadius: 10,
+      },
+      defaultProps: {
+        variant: "solid",
+      },
+      variants: {
+        solid: {
+          backgroundColor: "primary.50",
+          _pressed: {
+            backgroundColor: "primary.200",
+          },
+        },
+        link: {
+          backgroundColor: "transparent",
+          _pressed: {
+            backgroundColor: "primary.50",
+          },
+        },
+      },
+    },
+
+    Icon: {
+      baseStyle: {
+        color: "primary.500",
+      },
+      defaultProps: {},
+    },
+
     FormControlLabel: {
       baseStyle: {
         _text: {
-          color: "muted.500",
           fontSize: "sm",
           bold: true,
           textTransform: "uppercase",
         },
       },
     },
-    Avatar: {
+    FormControlErrorMessage: {
       baseStyle: {
-        bg: "muted.500",
+        _text: {
+          fontWeight: "bold",
+        },
       },
     },
+    Avatar: {},
   },
 });
 

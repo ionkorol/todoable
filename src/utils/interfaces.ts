@@ -1,10 +1,31 @@
 export interface UserProp {
   id: string;
-  createdAt: string;
+  createdAt: number;
   name: string;
-  email: string;
-  groups: string;
-  selectedGroup: string;
+  email: string | null | undefined;
+  phoneNumber: string | null | undefined;
+}
+
+export interface GroupProp {
+  id: string;
+  name: string;
+  members: string[];
+}
+
+export interface ListProp {
+  id: string;
+  createdAt: number;
+  name: string;
+  icon: string;
+  color: string;
+  group: string;
+  author: string;
+}
+
+export interface MembersProp {
+  id: string;
+  role: MemberRole;
+  data?: UserProp;
 }
 
 export interface TaskProp {
@@ -14,29 +35,17 @@ export interface TaskProp {
   description: string;
   // date: string;
   // time: string;
-  list: string;
   status: "active" | "overdue" | "complete";
-  progress: TaskProgressProp[];
+  list: string;
+  group: string;
 }
 
-export interface TaskProgressProp {
+export interface ProgressProp {
   id: string;
   createdAt: number;
   user: UserProp;
   description: string;
+  task: string;
 }
 
-export interface ListProp {
-  id: string;
-  createdAt: number;
-  name: string;
-  group: string;
-  tasks: TaskProp[];
-}
-
-export interface GroupProp {
-  id: string;
-  name: string;
-  members: UserProp[];
-  lists: ListProp[];
-}
+type MemberRole = "admin" | "editor" | "member";

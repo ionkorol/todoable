@@ -1,21 +1,29 @@
-import { createStore, combineReducers, applyMiddleware } from "redux";
-import thunk from "redux-thunk";
-
+import { configureStore } from "@reduxjs/toolkit";
 import {
-  userReducer,
   modalsReducer,
-  selectedReducer,
-} from "redux-store/reducers";
+  userReducer,
+  groupsReducer,
+  listsReducer,
+  tasksReducer,
+  progressReducer,
+  membersReducer,
+} from "./slices";
 
-const rootReducer = combineReducers({
-  user: userReducer,
-  selected: selectedReducer,
-  modals: modalsReducer,
+const store = configureStore({
+  reducer: {
+    modals: modalsReducer,
+    user: userReducer,
+    groups: groupsReducer,
+    lists: listsReducer,
+    tasks: tasksReducer,
+    progress: progressReducer,
+    members: membersReducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }),
 });
 
-const store = createStore(rootReducer, applyMiddleware(thunk));
-
-export type RootState = ReturnType<typeof rootReducer>;
+export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
 export default store;

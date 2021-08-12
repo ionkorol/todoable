@@ -1,21 +1,36 @@
-import { joinGroup } from "lib/group";
-import { showJoinGroupModal } from "lib/modals";
-import { VStack, FormControl, Input, Modal, Alert, Button } from "native-base";
+import {
+  VStack,
+  FormControl,
+  Input,
+  Modal,
+  Alert,
+  Button,
+  Slide,
+  HStack,
+  Heading,
+  IconButton,
+  Icon,
+} from "native-base";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "redux-store/store";
 import * as yup from "yup";
 import { useFormik } from "formik";
+import { modalJoinGroupShow } from "redux-store/slices/modals";
+import { joinGroup, updateGroup } from "redux-store/slices/groups";
+import { useAppDispatch, useAppSelector } from "hooks/redux";
+import { FlingGestureHandler, Directions } from "react-native-gesture-handler";
+import { Feather } from "@expo/vector-icons";
 
 const schema = yup.object().shape({
   id: yup.string().required("ID is required!"),
 });
 
 const JoinGroupModal = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const show = useSelector((state: RootState) => state.modals.joinGroup);
-  const onClose = () => showJoinGroupModal(false);
+  const { error, loading } = useAppSelector((state) => state.groups);
+  const dispatch = useAppDispatch();
+  const onClose = () => dispatch(modalJoinGroupShow(false));
 
   const formik = useFormik({
     validationSchema: schema,
@@ -23,59 +38,53 @@ const JoinGroupModal = () => {
       id: "",
     },
     onSubmit: async (values) => {
-      setLoading(true);
-      try {
-        const res = await joinGroup(values.id);
-        if (res) {
-          onClose();
-        } else {
-          setError("Unabel to join group!");
-        }
-      } catch (error) {
-        console.log(error);
-      }
-      setLoading(false);
+      dispatch(joinGroup(values.id)).then(() =>
+        dispatch(modalJoinGroupShow(false))
+      );
     },
   });
 
-  console.log(show);
-
   return (
-    <Modal isOpen={show} onClose={onClose}>
-      <Modal.Content>
-        <Modal.CloseButton />
-        <Modal.Header>Join Group</Modal.Header>
-        <Modal.Body>
-          <VStack space={10} mt={5}>
-            {error && (
-              <Alert status="error">
-                <Alert.Icon />
-                <Alert.Title flexShrink={1}>{error}</Alert.Title>
-              </Alert>
-            )}
-            <FormControl isInvalid={!!formik.errors.id}>
-              <FormControl.Label
-                _text={{ color: "muted.500", fontSize: "sm", bold: true }}
-              >
-                ID
-              </FormControl.Label>
-              <Input
-                value={formik.values.id}
-                onChange={(e) => formik.setFieldValue("id", e.nativeEvent.text)}
-              />
-              <FormControl.ErrorMessage>
-                {formik.errors.id}
-              </FormControl.ErrorMessage>
-            </FormControl>
-          </VStack>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button isLoading={loading} onPress={() => formik.handleSubmit()}>
+    <Slide in={show} placement="top">
+      <FlingGestureHandler
+        direction={Directions.UP}
+        onActivated={(e) => onClose()}
+      >
+        <VStack space={5} backgroundColor="white" shadow={5} p={5}>
+          <HStack justifyContent="space-between">
+            <Heading>Join Group</Heading>
+            <IconButton
+              variant="ghost"
+              icon={<Icon as={Feather} name="x" />}
+              onPress={onClose}
+            />
+          </HStack>
+          {error && (
+            <Alert status="error">
+              <Alert.Icon />
+              <Alert.Title flexShrink={1}>Unable to join group!</Alert.Title>
+            </Alert>
+          )}
+          <FormControl isInvalid={!!formik.errors.id}>
+            <FormControl.Label>ID</FormControl.Label>
+            <Input
+              value={formik.values.id}
+              onChange={(e) => formik.setFieldValue("id", e.nativeEvent.text)}
+              placeholder="Enter group ID"
+            />
+            <FormControl.ErrorMessage>
+              {formik.errors.id}
+            </FormControl.ErrorMessage>
+          </FormControl>
+          <Button
+            isLoading={loading.updating}
+            onPress={() => formik.handleSubmit()}
+          >
             Join Group
           </Button>
-        </Modal.Footer>
-      </Modal.Content>
-    </Modal>
+        </VStack>
+      </FlingGestureHandler>
+    </Slide>
   );
 };
 

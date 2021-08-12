@@ -1,24 +1,22 @@
 import React, { useState } from "react";
 import * as yup from "yup";
 import { useFormik } from "formik";
-import { createProgress } from "lib/task/progress";
+import * as ProgressApi from "lib/progressApi";
 
 import { Feather } from "@expo/vector-icons";
 import { HStack, Input, Icon, IconButton } from "native-base";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useSelector } from "react-redux";
+import { RootState } from "redux-store/store";
 
 const schema = yup.object().shape({
   description: yup.string().required("Required"),
 });
 
-interface Props {
-  taskId: string;
-}
+interface Props {}
 
 const ProgressAdd: React.FC<Props> = (props) => {
-  const { taskId } = props;
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { error } = useSelector((state: RootState) => state.progress);
 
   const formik = useFormik({
     initialValues: {
@@ -27,39 +25,28 @@ const ProgressAdd: React.FC<Props> = (props) => {
     validationSchema: schema,
     onSubmit: async (values) => {
       setLoading(true);
-      try {
-        await createProgress(taskId, values as any);
-      } catch (error) {
-        setError(error.message);
-      }
+      ProgressApi.createProgress("", values);
       setLoading(false);
     },
   });
 
   return (
-    <HStack space={5}>
+    <HStack space={3}>
       <Input
         value={formik.values.description}
         onChange={(e) =>
           formik.setFieldValue("description", e.nativeEvent.text)
         }
         InputLeftElement={
-          <Icon
-            as={<Feather name="user" />}
-            color="muted.500"
-            size="sm"
-            ml={2}
-          />
+          <Icon as={Feather} name="plus" color="primary.100" size="sm" ml={2} />
         }
         placeholder="Enter your progress"
-        variant="filled"
-        size="sm"
+        borderWidth={2}
         flex={1}
       />
 
       <IconButton
-        size="sm"
-        icon={<Icon color="success.500" as={<Feather name="arrow-up-circle" />} />}
+        icon={<Icon color="#fff" as={<Feather name="arrow-up-circle" />} />}
         onPress={() => formik.handleSubmit()}
         isLoading={loading}
         isLoadingText={undefined}

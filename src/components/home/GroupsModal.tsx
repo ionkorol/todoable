@@ -1,99 +1,92 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
-  Modal,
   Button,
-  ScrollView,
-  Text,
-  Spinner,
-  Pressable,
   Icon,
+  IconButton,
+  HStack,
+  Slide,
+  Box,
+  Heading,
+  Avatar,
 } from "native-base";
-import { GroupProp } from "utils/interfaces";
 import { RootState } from "redux-store/store";
-import { useDispatch, useSelector } from "react-redux";
-import { Feather } from "@expo/vector-icons";
-import { MODAL_NEW_GROUP_SET_SHOW } from "redux-store/actions/types";
-import { getGroups, setGroup } from "lib/group";
-import { showGroupsModal, showJoinGroupModal } from "lib/modals";
+import { useSelector } from "react-redux";
+import { Feather, MaterialIcons } from "@expo/vector-icons";
+import * as groupActions from "redux-store/slices/groups";
+import {
+  modalGroupsShow,
+  modalJoinGroupShow,
+  modalNewGroupShow,
+} from "redux-store/slices/modals";
+import { useAppDispatch } from "hooks/redux";
+import { OurPressable } from "components/ui";
+import { Directions, FlingGestureHandler } from "react-native-gesture-handler";
 
 interface Props {}
 
 const GroupsModal: React.FC<Props> = (props) => {
-  const [data, setData] = useState<GroupProp[]>([]);
-  const dispatch = useDispatch();
+  const { groups, group } = useSelector((state: RootState) => state.groups);
 
   const show = useSelector((state: RootState) => state.modals.groups);
-  const user = useSelector((state: RootState) => state.user.data);
 
-  const onClose = () => showGroupsModal(false);
-
-  const showNewGroupModal = () => {
-    dispatch({
-      type: MODAL_NEW_GROUP_SET_SHOW,
-      payload: true,
-    });
-    onClose();
-  };
-
-  const handleGetGroups = async () => {
-    const res = await getGroups();
-    if (res) {
-      setData(res);
-    } else {
-      console.log("Error");
-    }
-  };
-  useEffect(() => {
-    handleGetGroups();
-  }, [user?.groups]);
-
-  if (!data) {
-    return (
-      <Modal>
-        <Modal.Content>
-          <Modal.Body>
-            <Spinner />
-          </Modal.Body>
-        </Modal.Content>
-      </Modal>
-    );
-  }
+  const dispatch = useAppDispatch();
+  const onClose = () => dispatch(modalGroupsShow(false));
 
   return (
-    <Modal isOpen={show} onClose={onClose}>
-      <Modal.Content>
-        <Modal.CloseButton />
-        <Modal.Header>Select Group</Modal.Header>
-        <Modal.Body>
-          <ScrollView>
-            {data.map((group) => (
-              <Pressable
-                onPress={() => setGroup(group.id)}
-                border={1}
-                borderColor="muted.200"
-                p={5}
-                flexDirection="row"
-                justifyContent="space-between"
-                key={group.id}
-              >
-                <Text bold>{group.name}</Text>
-                {user?.selectedGroup === group.id && (
-                  <Icon as={<Feather name="check" />} color="secondary.500" />
-                )}
-              </Pressable>
-            ))}
-          </ScrollView>
-        </Modal.Body>
-        <Modal.Footer justifyContent="space-between">
-          <Button size="xs" onPress={showNewGroupModal}>
-            Create Group
-          </Button>
-          <Button onPress={() => showJoinGroupModal(true)} size="sm">
-            Join Group
-          </Button>
-        </Modal.Footer>
-      </Modal.Content>
-    </Modal>
+    <Slide in={show} placement="bottom">
+      <FlingGestureHandler
+        direction={Directions.DOWN}
+        onActivated={(e) => onClose()}
+      >
+        <Box backgroundColor="muted.50" p={5} shadow={5}>
+          <HStack justifyContent="space-between">
+            <Heading>Groups</Heading>
+            <IconButton
+              variant="ghost"
+              icon={<Icon as={Feather} name="x" size="sm" />}
+              onPress={onClose}
+            />
+          </HStack>
+          {groups.map((item) => (
+            <OurPressable
+              backgroundColor={item.id === group ? "primary.200" : "primary.50"}
+              onPress={() => dispatch(groupActions.setGroup(item.id))}
+              p={5}
+              my={2}
+              borderRadius={10}
+              flexDirection="row"
+              alignItems="center"
+              justifyContent="space-between"
+              key={item.id}
+            >
+              <HStack alignItems="center" space={2}>
+                <Avatar backgroundColor="muted.100">
+                  <Icon as={MaterialIcons} name="groups" />
+                </Avatar>
+                <Heading size="md">{item.name}</Heading>
+              </HStack>
+
+              {group === item.id && (
+                <IconButton
+                  icon={<Icon as={Feather} name="edit-2" size="sm" />}
+                />
+              )}
+            </OurPressable>
+          ))}
+          <HStack mt={5} justifyContent="space-between">
+            <Button size="sm" onPress={() => dispatch(modalNewGroupShow(true))}>
+              Create Group
+            </Button>
+            <Button
+              onPress={() => dispatch(modalJoinGroupShow(true))}
+              size="sm"
+            >
+              Join Group
+            </Button>
+          </HStack>
+        </Box>
+      </FlingGestureHandler>
+    </Slide>
   );
 };
 

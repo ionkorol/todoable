@@ -1,17 +1,37 @@
 import { NavigationContainer } from "@react-navigation/native";
-import React from "react";
-import { connect } from "react-redux";
+import firebase from "firebase";
+import { useAppDispatch, useAppSelector } from "hooks/redux";
+import React, { useEffect } from "react";
+import {
+  readUser,
+  userCredentialsUpdate,
+  userDataUpdate,
+} from "redux-store/slices/user";
 import { RootState } from "redux-store/store";
-import { UserProp } from "utils/interfaces";
 import AuthNavigation from "./Auth";
 import HomeNavigation from "./Home";
 
-interface Props {
-  data: UserProp | null;
-}
+interface Props {}
 
 const Main: React.FC<Props> = (props) => {
-  const { data } = props;
+  const { data, credentials } = useAppSelector(
+    (state: RootState) => state.user
+  );
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const unsub = firebase.auth().onAuthStateChanged(async (user) => {
+      if (user) {
+        dispatch(userCredentialsUpdate(user));
+        dispatch(readUser(user.uid));
+      } else {
+        dispatch(userCredentialsUpdate(null));
+        dispatch(userDataUpdate(null));
+      }
+    });
+
+    return () => unsub();
+  }, []);
 
   return (
     <NavigationContainer>
@@ -20,8 +40,4 @@ const Main: React.FC<Props> = (props) => {
   );
 };
 
-const mapState = (state: RootState) => ({
-  data: state.user.data,
-});
-
-export default connect(mapState)(Main);
+export default Main;

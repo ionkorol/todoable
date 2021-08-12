@@ -1,54 +1,60 @@
 import { Feather } from "@expo/vector-icons";
-import { Layout } from "components/common";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { Layout, UserAvatar } from "components/common";
+import { OurPressable } from "components/ui";
 import { logOut } from "lib/user";
-import {
-  Box,
-  Divider,
-  HStack,
-  VStack,
-  Heading,
-  Avatar,
-  Text,
-  Pressable,
-  Icon,
-} from "native-base";
-import React from "react";
+import { HStack, VStack, Heading, Text, Icon } from "native-base";
+import React, { useCallback } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "redux-store/store";
 
 const account = () => {
   const user = useSelector((state: RootState) => state.user.data!);
+  const nav = useNavigation();
+
+  useFocusEffect(useCallback(() => {}, []));
 
   return (
     <Layout>
-      <Box my={5}>
-        <Divider />
-        <HStack p={5} justifyContent="space-between" alignItems="center">
+      <VStack p={3} space={3}>
+        <HStack
+          backgroundColor="primary.50"
+          borderRadius={10}
+          p={5}
+          justifyContent="space-between"
+          alignItems="center"
+        >
           <VStack>
-            <Text color="primary.500">Hello</Text>
-            <Heading color="success.500">{user.name}</Heading>
+            <Text>Hello</Text>
+            <Heading>{user.name}</Heading>
           </VStack>
-          <Avatar bgColor="secondary.500">
-            {user.name
-              .split(/\s/)
-              .reduce(
-                (response: any, word: any) => (response += word.slice(0, 1)),
-                ""
-              )}
-          </Avatar>
+          <UserAvatar name={user.name} />
         </HStack>
-        <Divider />
-      </Box>
-      <Box>
-        <Divider />
-        <Pressable onPress={logOut}>
-          <HStack p={[3, 5]}>
-            <Icon as={<Feather name="log-out" />} mr={3} />
-            <Text fontSize="2xl">Log Out</Text>
+        <OurPressable onPress={() => nav.navigate("Feedback")}>
+          <HStack
+            space={3}
+            borderRadius={10}
+            p={5}
+            backgroundColor="primary.50"
+            alignItems="center"
+          >
+            <Icon as={Feather} name="mail" />
+            <Heading size="lg">Feedback</Heading>
           </HStack>
-        </Pressable>
-        <Divider />
-      </Box>
+        </OurPressable>
+        <OurPressable onPress={logOut}>
+          <HStack
+            space={3}
+            borderRadius={10}
+            p={5}
+            backgroundColor="primary.50"
+            alignItems="center"
+          >
+            <Icon as={Feather} name="log-out" />
+            <Heading size="lg">Log Out</Heading>
+          </HStack>
+        </OurPressable>
+      </VStack>
     </Layout>
   );
 };

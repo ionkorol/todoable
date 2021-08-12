@@ -1,19 +1,18 @@
 import { Feather } from "@expo/vector-icons";
-import { deleteProgress } from "lib/task/progress";
+import * as ProgressApi from "lib/progressApi";
 import moment from "moment";
 import { Avatar, Heading, HStack, Icon, IconButton, Text } from "native-base";
 import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "redux-store/store";
-import { TaskProgressProp } from "utils/interfaces";
+import { ProgressProp } from "utils/interfaces";
 
 interface Props {
-  data: TaskProgressProp;
-  taskId: string;
+  data: ProgressProp;
 }
 
 const ProgressItem: React.FC<Props> = (props) => {
-  const { data, taskId } = props;
+  const { data } = props;
   const user = useSelector((state: RootState) => state.user.data);
 
   const timeSince = () => {
@@ -56,7 +55,7 @@ const ProgressItem: React.FC<Props> = (props) => {
         <Text>{timeSince()}</Text>
         <IconButton
           icon={<Icon size="xs" color="error.500" as={<Feather name="x" />} />}
-          onPress={() => deleteProgress(taskId, data.id)}
+          onPress={() => ProgressApi.deleteProgress(data.task, data.id)}
           disabled={user?.id !== data.user.id}
         />
       </HStack>

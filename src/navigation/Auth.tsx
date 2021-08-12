@@ -1,17 +1,18 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
-import { LoginScreen, SignupScreen } from "screens/auth";
+import { EmailAuthScreen, PhoneAuthScreen, SignupScreen } from "screens/auth";
 
 const Stack = createStackNavigator();
 
 const AuthNavigation = () => {
   return (
     <Stack.Navigator
-      initialRouteName="login"
+      initialRouteName="PhoneAuth"
       screenOptions={{ headerShown: false }}
     >
-      <Stack.Screen name="login" component={LoginScreen} />
-      <Stack.Screen name="signup" component={SignupScreen} />
+      <Stack.Screen name="PhoneAuth" component={PhoneAuthScreen} />
+      <Stack.Screen name="EmailAuth" component={EmailAuthScreen} />
+      <Stack.Screen name="Signup" component={SignupScreen} />
     </Stack.Navigator>
   );
 };

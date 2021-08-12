@@ -1,9 +1,10 @@
+import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/core";
-import { useFocusEffect, useRoute } from "@react-navigation/native";
-import { Layout } from "components/common";
-import { ProgressList } from "components/task";
+import { useFocusEffect } from "@react-navigation/native";
+import { AppBar, Layout } from "components/common";
+import { OptionMenu } from "components/ui";
 import { useFormik } from "formik";
-import { deleteTask, getTask, updateTask } from "lib/task";
+import { useAppDispatch, useAppSelector } from "hooks/redux";
 import {
   VStack,
   FormControl,
@@ -13,11 +14,13 @@ import {
   Center,
   Spinner,
   TextArea,
-  ScrollView,
+  Icon,
 } from "native-base";
-import React, { useCallback, useEffect, useState } from "react";
-import { KeyboardAvoidingView } from "react-native";
-import { TaskProp } from "utils/interfaces";
+import React, { useCallback } from "react";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { updateTask, deleteTask } from "redux-store/slices/tasks";
+import { color } from "styled-system";
+
 import * as yup from "yup";
 
 const schema = yup.object().shape({
@@ -26,15 +29,12 @@ const schema = yup.object().shape({
 });
 
 const Task = () => {
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<TaskProp | null>(null);
-  const route = useRoute();
-  const taskId = (route.params as any).taskId;
-
+  const { loading, error, task } = useAppSelector((state) => state.tasks);
+  const data = useAppSelector((state) =>
+    state.tasks.tasks.find((item) => item.id === task)
+  );
   const nav = useNavigation();
-
+  const dispatch = useAppDispatch();
   const formik = useFormik({
     validationSchema: schema,
     initialValues: {
@@ -42,23 +42,33 @@ const Task = () => {
       description: data ? data.description : "",
     },
     onSubmit: async (values) => {
-      setLoading(true);
-      const res = await updateTask(taskId, values as any);
-      if (res) {
-        nav.navigate("List");
-      } else {
-        setError("Unable to update task!");
-      }
-      setLoading(false);
+      dispatch(updateTask({ ...data!, ...values }));
+      nav.navigate("List");
     },
     enableReinitialize: true,
   });
 
   useFocusEffect(
     useCallback(() => {
-      (async () => {
-        setData(await getTask(taskId));
-      })();
+      nav.setOptions({
+        headerRight: () => (
+          <OptionMenu
+            menu={[
+              {
+                title: "View Progress",
+                onPress: () => nav.navigate("Progress"),
+                icon: <Icon as={Feather} name="activity" color="primary.500" />,
+              },
+              {
+                title: "Delete Task",
+                onPress: () => dispatch(deleteTask(null)).then(nav.goBack),
+                icon: <Icon as={Feather} name="trash" color="error.500" />,
+                color: "error.500",
+              },
+            ]}
+          />
+        ),
+      });
     }, [])
   );
 
@@ -74,50 +84,42 @@ const Task = () => {
 
   return (
     <Layout>
-      <VStack space={10} m={5}>
-        {error && (
-          <Alert status="error">
-            <Alert.Icon />
-            <Alert.Title flexShrink={1}>{error}</Alert.Title>
-          </Alert>
-        )}
-        <FormControl isInvalid={!!formik.errors.name}>
-          <FormControl.Label>Name</FormControl.Label>
-          <Input
-            value={formik.values.name}
-            onChange={(e) => formik.setFieldValue("name", e.nativeEvent.text)}
-          />
-          <FormControl.ErrorMessage>
-            {formik.errors.name}
-          </FormControl.ErrorMessage>
-        </FormControl>
-        <FormControl isInvalid={!!formik.errors.description}>
-          <FormControl.Label>Description</FormControl.Label>
-          <TextArea
-            value={formik.values.description}
-            onChange={(e) =>
-              formik.setFieldValue("description", e.nativeEvent.text)
-            }
-          />
-        </FormControl>
-        <ProgressList taskId={data.id} />
-        <Button isLoading={loading} onPress={() => formik.handleSubmit()}>
-          Update Task
-        </Button>
-        <Button
-          isLoading={deleteLoading}
-          colorScheme="error"
-          _text={{ color: "white" }}
-          onPress={async () => {
-            setDeleteLoading(true);
-            await deleteTask(data.id);
-            setDeleteLoading(false);
-            nav.goBack();
-          }}
-        >
-          Delete Task
-        </Button>
-      </VStack>
+      <KeyboardAwareScrollView>
+        <VStack space={10} m={5}>
+          {error && (
+            <Alert status="error">
+              <Alert.Icon />
+              <Alert.Title flexShrink={1}>{error}</Alert.Title>
+            </Alert>
+          )}
+          <FormControl isInvalid={!!formik.errors.name}>
+            <FormControl.Label>Name</FormControl.Label>
+            <Input
+              value={formik.values.name}
+              onChange={(e) => formik.setFieldValue("name", e.nativeEvent.text)}
+            />
+            <FormControl.ErrorMessage>
+              {formik.errors.name}
+            </FormControl.ErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={!!formik.errors.description}>
+            <FormControl.Label>Description</FormControl.Label>
+            <TextArea
+              value={formik.values.description}
+              onChange={(e) =>
+                formik.setFieldValue("description", e.nativeEvent.text)
+              }
+            />
+          </FormControl>
+
+          <Button
+            isLoading={loading.updating}
+            onPress={() => formik.handleSubmit()}
+          >
+            Update Task
+          </Button>
+        </VStack>
+      </KeyboardAwareScrollView>
     </Layout>
   );
 };
