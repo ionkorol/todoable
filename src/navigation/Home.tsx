@@ -1,8 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import {
-  createStackNavigator,
-  TransitionPresets,
-} from "@react-navigation/stack";
+import { createStackNavigator } from "@react-navigation/stack";
 import { Heading, Icon } from "native-base";
 import React from "react";
 import {
@@ -38,7 +35,7 @@ const HomeNavigation = () => {
           },
           height: 100,
         },
-        ...TransitionPresets.ModalTransition,
+        // ...TransitionPresets.ModalTransition,
       }}
     >
       <Stack.Screen

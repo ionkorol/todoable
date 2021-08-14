@@ -2,7 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Layout, UserAvatar } from "components/common";
 import { OurPressable } from "components/ui";
-import { logOut } from "lib/user";
+import { logOut } from "lib/userApi";
 import { HStack, VStack, Heading, Text, Icon } from "native-base";
 import React, { useCallback } from "react";
 import { useSelector } from "react-redux";
@@ -28,7 +28,7 @@ const account = () => {
             <Text>Hello</Text>
             <Heading>{user.name}</Heading>
           </VStack>
-          <UserAvatar name={user.name} />
+          <UserAvatar />
         </HStack>
         <OurPressable onPress={() => nav.navigate("Feedback")}>
           <HStack

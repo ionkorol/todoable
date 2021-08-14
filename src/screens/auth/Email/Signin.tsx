@@ -1,6 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
 import { Layout } from "components/common";
-import { emailAuth, errorHandler } from "lib/user";
 import {
   Box,
   Button,
@@ -44,16 +43,7 @@ const Login = () => {
       password: "",
     },
     onSubmit: async (values) => {
-      setLoading(true);
-      try {
-        const userCreds = await emailAuth(values.email, values.password);
-        if (userCreds.additionalUserInfo?.isNewUser) {
-          nav.navigate("Signup");
-        }
-      } catch (error) {
-        setError(errorHandler(error.code));
-      }
-      setLoading(false);
+      console.log(values);
     },
   });
 
