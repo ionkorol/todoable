@@ -1,5 +1,10 @@
 {
   "build": {
-    "release": {}
+    "release": {},
+    "preview": {
+      "ios": {
+        "simulator": true
+      }
+    }
   }
 }

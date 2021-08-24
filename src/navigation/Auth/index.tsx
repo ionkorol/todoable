@@ -8,7 +8,7 @@ const Stack = createStackNavigator();
 const AuthNavigation = () => {
   return (
     <Stack.Navigator
-      initialRouteName="PhoneAuth"
+      initialRouteName="EmailAuth"
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="PhoneAuth" component={PhoneAuthNavigation} />
